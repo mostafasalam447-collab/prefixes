@@ -3,104 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Prefixes Quiz</title>
+    <title>Medical Prefixes Quiz - Modern Edition</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --light: #f4f7f6;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
-            margin: 0;
-            padding-top: 80px; /* مساحة للعداد الثابت */
+            --bg-color: #0b0e14;
+            --card-bg: #161b22;
+            --primary-cyan: #00f2ff;
+            --text-main: #e6edf3;
+            --success: #2ea043;
+            --danger: #f85149;
         }
 
-        /* شريط العداد الثابت */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding-top: 100px;
+            line-height: 1.6;
+        }
+
+        /* شريط العداد المطور */
         #stats-bar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
-            background: var(--primary);
-            color: white;
+            height: 70px;
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-bottom: 2px solid var(--primary-cyan);
             z-index: 1000;
-            padding: 0 10px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
+
         .stat-item {
             text-align: center;
-            font-size: 0.9rem;
         }
+
         .stat-value {
             display: block;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            color: var(--primary-cyan);
         }
 
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: auto;
             padding: 20px;
         }
 
         .question-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            border: 1px solid #30363d;
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--primary-cyan);
+        }
+
+        /* الدائرة اللبني للترقيم */
+        .q-number {
+            position: absolute;
+            right: -25px;
+            top: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-cyan);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
         }
 
         .question-text {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            margin-right: 40px;
+            display: block;
+            direction: ltr;
+            text-align: left;
         }
 
-        .options-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .option {
-            background: #fff;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left; /* لغة الأسئلة إنجليزية */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             direction: ltr;
         }
 
+        .option {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 1rem;
+        }
+
         .option:hover {
-            border-color: var(--primary);
-            background: #f0f4f8;
+            background: #30363d;
+            border-color: var(--primary-cyan);
+            transform: scale(1.02);
         }
 
         .option.correct {
-            background-color: #d4edda !important;
-            border-color: var(--success) !important;
-            color: #155724;
+            background-color: var(--success) !important;
+            border-color: #7ee787 !important;
+            color: white;
         }
 
         .option.wrong {
-            background-color: #f8d7da !important;
-            border-color: var(--danger) !important;
-            color: #721c24;
+            background-color: var(--danger) !important;
+            border-color: #ffa198 !important;
+            color: white;
         }
 
-        .disabled {
-            pointer-events: none;
+        .disabled { pointer-events: none; opacity: 0.8; }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .q-number { right: -10px; width: 40px; height: 40px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -113,125 +152,138 @@
     <div class="stat-item">السؤال <span id="progress" class="stat-value">0/65</span></div>
 </div>
 
-<div class="container" id="quiz-container">
-    </div>
+<div class="container" id="quiz-container"></div>
 
 <script>
-    const questions = [
-        { q: "What does the prefix 'Bi-' mean?", options: ["One", "Three", "Both, two", "Four"], correct: 2 },
-        { q: "The prefix 'Tri-' refers to:", options: ["Two", "Three", "Four", "Many"], correct: 1 },
-        { q: "What does the prefix 'Tetra-' mean?", options: ["Three", "Four", "Five", "Six"], correct: 1 },
-        { q: "Which prefix means 'Four' (other than Tetra)?", options: ["Quardi-", "Primi-", "Multi-", "Di-"], correct: 0 },
-        { q: "The prefix 'Hemi-' means:", options: ["Full", "Half", "Quarter", "Double"], correct: 1 },
-        { q: "What does the prefix 'Semi-' mean?", options: ["Whole", "Half", "Part", "Many"], correct: 1 },
-        { q: "The prefix 'Primi-' refers to:", options: ["Second", "Last", "First", "Middle"], correct: 2 },
-        { q: "What does 'Multi-' mean?", options: ["None", "One", "Few", "Many"], correct: 3 },
-        { q: "The prefix 'Poly-' has the same meaning as:", options: ["Olig-", "Multi-", "Semi-", "Mono-"], correct: 1 },
-        { q: "What does 'Olig-' mean?", options: ["Little, few", "Excessive", "Many", "None"], correct: 0 },
-        { q: "The prefix 'Nulli-' means:", options: ["All", "Many", "None", "One"], correct: 2 },
-        { q: "What does 'Milli-' represent?", options: ["One-hundredth", "One-thousandth", "One-millionth", "Ten"], correct: 1 },
-        { q: "The prefix 'Di-' means:", options: ["One", "Two", "Three", "Double"], correct: 1 },
-        { q: "What does the prefix 'Eryth-' mean?", options: ["White", "Blue", "Red", "Black"], correct: 2 },
-        { q: "The prefix 'Leuk-' refers to which color?", options: ["Red", "White", "Yellow", "Gray"], correct: 1 },
-        { q: "What does 'Melan-' mean?", options: ["White", "Black", "Red", "Silver"], correct: 1 },
-        { q: "The prefix 'Glauc-' refers to:", options: ["Blue", "Green", "Gray, silver", "Yellow"], correct: 2 },
-        { q: "What does 'Jaundo-' mean?", options: ["Yellow", "Red", "Pink", "Blue"], correct: 0 },
-        { q: "What does 'Ab-' mean?", options: ["Toward", "Away from", "Inside", "Outside"], correct: 1 },
-        { q: "The prefix 'Ad-' means:", options: ["Away from", "Toward", "Under", "Above"], correct: 1 },
-        { q: "What does 'Circum-' mean?", options: ["Across", "Around", "Between", "Within"], correct: 1 },
-        { q: "The prefix 'Peri-' means:", options: ["Under", "Around, near", "Inside", "Far"], correct: 1 },
-        { q: "What does 'Endo-' mean?", options: ["Outside", "Within", "Above", "Under"], correct: 1 },
-        { q: "The prefix 'Intra-' means:", options: ["Between", "Inside", "Outside", "Beside"], correct: 1 },
-        { q: "What does 'Ecto-' mean?", options: ["Inside", "Outside", "Under", "Between"], correct: 1 },
-        { q: "The prefix 'Extra-' means:", options: ["Within", "Outside, beyond", "Near", "Between"], correct: 1 },
-        { q: "What does 'Inter-' mean?", options: ["Inside", "Between", "Under", "Above"], correct: 1 },
-        { q: "The prefix 'Sub-' means:", options: ["Above", "Below", "Beside", "Across"], correct: 1 },
-        { q: "What does 'Infra-' mean?", options: ["Above", "Beneath, below, under", "Within", "Between"], correct: 1 },
-        { q: "The prefix 'Super-' means:", options: ["Below", "Above", "Beside", "Under"], correct: 1 },
-        { q: "What does 'Supra-' mean?", options: ["Below", "Above", "Within", "Near"], correct: 1 },
-        { q: "The prefix 'Epi-' means:", options: ["Under", "Upon", "Beside", "Behind"], correct: 1 },
-        { q: "What does 'Trans-' mean?", options: ["Around", "Across", "Under", "Within"], correct: 1 },
-        { q: "The prefix 'Meso-' refers to:", options: ["Top", "Bottom", "Middle", "Side"], correct: 2 },
-        { q: "What does 'Juxta-' mean?", options: ["Far from", "Near, beside", "Inside", "Outside"], correct: 1 },
-        { q: "The prefix 'Retro-' means:", options: ["Forward", "Backward, behind", "Toward", "Around"], correct: 1 },
-        { q: "What does 'Ante-' mean?", options: ["After", "Before", "During", "Now"], correct: 1 },
-        { q: "The prefix 'Pre-' means:", options: ["After", "Before", "Between", "Behind"], correct: 1 },
-        { q: "What does 'Post-' mean?", options: ["Before", "Behind, after", "During", "Beside"], correct: 1 },
-        { q: "The prefix 'Pro-' can mean:", options: ["Backward", "Forward, in front of", "Under", "Against"], correct: 1 },
-        { q: "What does 'Neo-' mean?", options: ["Old", "New", "Small", "Large"], correct: 1 },
-        { q: "The prefix 'Meta-' means:", options: ["Before", "Change, after", "During", "Always"], correct: 1 },
-        { q: "What does 'A-, An-, Ana-' mean?", options: ["With", "Not, without", "Many", "Excessive"], correct: 1 },
-        { q: "The prefix 'Anti-' means:", options: ["With", "Against", "For", "Before"], correct: 1 },
-        { q: "What does 'Contra-' mean?", options: ["With", "Toward", "Against", "Near"], correct: 2 },
-        { q: "The prefix 'Dis-' refers to:", options: ["Toward", "Away from, separation", "Together", "Within"], correct: 1 },
-        { q: "What does 'Brady-' mean?", options: ["Fast", "Slow", "Normal", "High"], correct: 1 },
-        { q: "The prefix 'Hyper-' means:", options: ["Deficient", "Excessive, high", "Normal", "Low"], correct: 1 },
-        { q: "What does 'Hypo-' mean?", options: ["Excessive", "Deficient, low", "Fast", "Same"], correct: 1 },
-        { q: "The prefix 'Heter-' means:", options: ["Same", "Different", "Large", "Small"], correct: 1 },
-        { q: "What does 'Ipsi-' mean?", options: ["Different", "Same", "Opposite", "Many"], correct: 1 },
-        { q: "The prefix 'Pseudo-' means:", options: ["True", "False", "New", "Old"], correct: 1 },
-        { q: "What does 'Re-' mean?", options: ["Never", "Again", "Before", "After"], correct: 1 },
-        { q: "What does 'Micro-' mean?", options: ["Large", "Small", "Normal", "Heavy"], correct: 1 },
-        { q: "The prefix 'Mega-' means:", options: ["Small", "Great, large", "Thin", "Slow"], correct: 1 },
-        { q: "What does 'Bio-' refer to?", options: ["Death", "Live, life", "Water", "Air"], correct: 1 },
-        { q: "The prefix 'Hydr-' refers to:", options: ["Gas", "Fire", "Water", "Life"], correct: 2 },
-        { q: "What does 'Therm-' mean?", options: ["Cold", "Heat", "Pressure", "Water"], correct: 1 },
-        { q: "The prefix 'Lipo-' refers to:", options: ["Muscle", "Bone", "Fat", "Blood"], correct: 2 },
-        { q: "What does 'Gyne-' refer to?", options: ["Man", "Woman", "Child", "Elderly"], correct: 1 },
-        { q: "The prefix 'Oo-' refers to:", options: ["Sperm", "Egg", "Cell", "Tissue"], correct: 1 },
-        { q: "Which prefix means 'Around'?", options: ["Sub-", "Endo-", "Peri- or Circum-", "Trans-"], correct: 2 },
-        { q: "'Tachy-' (Fast) is the opposite of:", options: ["Hyper-", "Brady-", "Neo-", "Poly-"], correct: 1 },
-        { q: "'Excessive' is the meaning of:", options: ["Hypo-", "Hyper-", "Micro-", "Nulli-"], correct: 1 },
-        { q: "'Backward' is represented by:", options: ["Pro-", "Retro-", "Pre-", "Ante-"], correct: 1 }
+    const questionsData = [
+        { q: "What does the prefix 'Bi-' mean?", options: ["One", "Three", "Both, two", "Four"], correct: "Both, two" },
+        { q: "The prefix 'Tri-' refers to:", options: ["Two", "Three", "Four", "Many"], correct: "Three" },
+        { q: "What does the prefix 'Tetra-' mean?", options: ["Three", "Four", "Five", "Six"], correct: "Four" },
+        { q: "Which prefix means 'Four' (other than Tetra)?", options: ["Quardi-", "Primi-", "Multi-", "Di-"], correct: "Quardi-" },
+        { q: "The prefix 'Hemi-' means:", options: ["Full", "Half", "Quarter", "Double"], correct: "Half" },
+        { q: "What does the prefix 'Semi-' mean?", options: ["Whole", "Half", "Part", "Many"], correct: "Half" },
+        { q: "The prefix 'Primi-' refers to:", options: ["Second", "Last", "First", "Middle"], correct: "First" },
+        { q: "What does 'Multi-' mean?", options: ["None", "One", "Few", "Many"], correct: "Many" },
+        { q: "The prefix 'Poly-' has the same meaning as:", options: ["Olig-", "Multi-", "Semi-", "Mono-"], correct: "Multi-" },
+        { q: "What does 'Olig-' mean?", options: ["Little, few", "Excessive", "Many", "None"], correct: "Little, few" },
+        { q: "The prefix 'Nulli-' means:", options: ["All", "Many", "None", "One"], correct: "None" },
+        { q: "What does 'Milli-' represent?", options: ["One-hundredth", "One-thousandth", "One-millionth", "Ten"], correct: "One-thousandth" },
+        { q: "The prefix 'Di-' means:", options: ["One", "Two", "Three", "Double"], correct: "Two" },
+        { q: "What does the prefix 'Eryth-' mean?", options: ["White", "Blue", "Red", "Black"], correct: "Red" },
+        { q: "The prefix 'Leuk-' refers to which color?", options: ["Red", "White", "Yellow", "Gray"], correct: "White" },
+        { q: "What does 'Melan-' mean?", options: ["White", "Black", "Red", "Silver"], correct: "Black" },
+        { q: "The prefix 'Glauc-' refers to:", options: ["Blue", "Green", "Gray, silver", "Yellow"], correct: "Gray, silver" },
+        { q: "What does 'Jaundo-' mean?", options: ["Yellow", "Red", "Pink", "Blue"], correct: "Yellow" },
+        { q: "What does 'Ab-' mean?", options: ["Toward", "Away from", "Inside", "Outside"], correct: "Away from" },
+        { q: "The prefix 'Ad-' means:", options: ["Away from", "Toward", "Under", "Above"], correct: "Toward" },
+        { q: "What does 'Circum-' mean?", options: ["Across", "Around", "Between", "Within"], correct: "Around" },
+        { q: "The prefix 'Peri-' means:", options: ["Under", "Around, near", "Inside", "Far"], correct: "Around, near" },
+        { q: "What does 'Endo-' mean?", options: ["Outside", "Within", "Above", "Under"], correct: "Within" },
+        { q: "The prefix 'Intra-' means:", options: ["Between", "Inside", "Outside", "Beside"], correct: "Inside" },
+        { q: "What does 'Ecto-' mean?", options: ["Inside", "Outside", "Under", "Between"], correct: "Outside" },
+        { q: "The prefix 'Extra-' means:", options: ["Within", "Outside, beyond", "Near", "Between"], correct: "Outside, beyond" },
+        { q: "What does 'Inter-' mean?", options: ["Inside", "Between", "Under", "Above"], correct: "Between" },
+        { q: "The prefix 'Sub-' means:", options: ["Above", "Below", "Beside", "Across"], correct: "Below" },
+        { q: "What does 'Infra-' mean?", options: ["Above", "Beneath, below, under", "Within", "Between"], correct: "Beneath, below, under" },
+        { q: "The prefix 'Super-' means:", options: ["Below", "Above", "Beside", "Under"], correct: "Above" },
+        { q: "What does 'Supra-' mean?", options: ["Below", "Above", "Within", "Near"], correct: "Above" },
+        { q: "The prefix 'Epi-' means:", options: ["Under", "Upon", "Beside", "Behind"], correct: "Upon" },
+        { q: "What does 'Trans-' mean?", options: ["Around", "Across", "Under", "Within"], correct: "Across" },
+        { q: "The prefix 'Meso-' refers to:", options: ["Top", "Bottom", "Middle", "Side"], correct: "Middle" },
+        { q: "What does 'Juxta-' mean?", options: ["Far from", "Near, beside", "Inside", "Outside"], correct: "Near, beside" },
+        { q: "The prefix 'Retro-' means:", options: ["Forward", "Backward, behind", "Toward", "Around"], correct: "Backward, behind" },
+        { q: "What does 'Ante-' mean?", options: ["After", "Before", "During", "Now"], correct: "Before" },
+        { q: "The prefix 'Pre-' means:", options: ["After", "Before", "Between", "Behind"], correct: "Before" },
+        { q: "What does 'Post-' mean?", options: ["Before", "Behind, after", "During", "Beside"], correct: "Behind, after" },
+        { q: "The prefix 'Pro-' can mean:", options: ["Backward", "Forward, in front of", "Under", "Against"], correct: "Forward, in front of" },
+        { q: "What does 'Neo-' mean?", options: ["Old", "New", "Small", "Large"], correct: "New" },
+        { q: "The prefix 'Meta-' means:", options: ["Before", "Change, after", "During", "Always"], correct: "Change, after" },
+        { q: "What does 'A-, An-, Ana-' mean?", options: ["With", "Not, without", "Many", "Excessive"], correct: "Not, without" },
+        { q: "The prefix 'Anti-' means:", options: ["With", "Against", "For", "Before"], correct: "Against" },
+        { q: "What does 'Contra-' mean?", options: ["With", "Toward", "Against", "Near"], correct: "Against" },
+        { q: "The prefix 'Dis-' refers to:", options: ["Toward", "Away from, separation", "Together", "Within"], correct: "Away from, separation" },
+        { q: "What does 'Brady-' mean?", options: ["Fast", "Slow", "Normal", "High"], correct: "Slow" },
+        { q: "The prefix 'Hyper-' means:", options: ["Deficient", "Excessive, high", "Normal", "Low"], correct: "Excessive, high" },
+        { q: "What does 'Hypo-' mean?", options: ["Excessive", "Deficient, low", "Fast", "Same"], correct: "Deficient, low" },
+        { q: "The prefix 'Heter-' means:", options: ["Same", "Different", "Large", "Small"], correct: "Different" },
+        { q: "What does 'Ipsi-' mean?", options: ["Different", "Same", "Opposite", "Many"], correct: "Same" },
+        { q: "The prefix 'Pseudo-' means:", options: ["True", "False", "New", "Old"], correct: "False" },
+        { q: "What does 'Re-' mean?", options: ["Never", "Again", "Before", "After"], correct: "Again" },
+        { q: "What does 'Micro-' mean?", options: ["Large", "Small", "Normal", "Heavy"], correct: "Small" },
+        { q: "The prefix 'Mega-' means:", options: ["Small", "Great, large", "Thin", "Slow"], correct: "Great, large" },
+        { q: "What does 'Bio-' refer to?", options: ["Death", "Live, life", "Water", "Air"], correct: "Live, life" },
+        { q: "The prefix 'Hydr-' refers to:", options: ["Gas", "Fire", "Water", "Life"], correct: "Water" },
+        { q: "What does 'Therm-' mean?", options: ["Cold", "Heat", "Pressure", "Water"], correct: "Heat" },
+        { q: "The prefix 'Lipo-' refers to:", options: ["Muscle", "Bone", "Fat", "Blood"], correct: "Fat" },
+        { q: "What does 'Gyne-' refer to?", options: ["Man", "Woman", "Child", "Elderly"], correct: "Woman" },
+        { q: "The prefix 'Oo-' refers to:", options: ["Sperm", "Egg", "Cell", "Tissue"], correct: "Egg" },
+        { q: "Which prefix means 'Around'?", options: ["Sub-", "Endo-", "Peri- or Circum-", "Trans-"], correct: "Peri- or Circum-" },
+        { q: "'Tachy-' (Fast) is the opposite of:", options: ["Hyper-", "Brady-", "Neo-", "Poly-"], correct: "Brady-" },
+        { q: "'Excessive' is the meaning of:", options: ["Hypo-", "Hyper-", "Micro-", "Nulli-"], correct: "Hyper-" },
+        { q: "'Backward' is represented by:", options: ["Pro-", "Retro-", "Pre-", "Ante-"], correct: "Retro-" }
     ];
 
     let correctScore = 0;
     let wrongScore = 0;
     let answeredQuestions = 0;
 
-    const quizContainer = document.getElementById('quiz-container');
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
 
     function initQuiz() {
-        questions.forEach((item, index) => {
+        const container = document.getElementById('quiz-container');
+        questionsData.forEach((item, index) => {
+            // لخبطة الخيارات لكل سؤال بشكل منفصل
+            const shuffledOptions = shuffleArray([...item.options]);
+            
             const card = document.createElement('div');
             card.className = 'question-card';
             card.innerHTML = `
-                <div class="question-text">${index + 1}. ${item.q}</div>
-                <div class="options-list" id="q${index}">
-                    ${item.options.map((opt, i) => `<div class="option" onclick="checkAnswer(${index}, ${i})">${opt}</div>`).join('')}
+                <div class="q-number">${index + 1}</div>
+                <div class="question-text">${item.q}</div>
+                <div class="options-grid" id="q${index}">
+                    ${shuffledOptions.map(opt => `
+                        <div class="option" onclick="handleSelect(${index}, this, '${item.correct}')">${opt}</div>
+                    `).join('')}
                 </div>
             `;
-            quizContainer.appendChild(card);
+            container.appendChild(card);
         });
         updateStats();
     }
 
-    window.checkAnswer = function(qIndex, optIndex) {
-        const optionsList = document.getElementById(`q${qIndex}`);
-        const selectedOption = optionsList.children[optIndex];
-        const correctIndex = questions[qIndex].correct;
+    window.handleSelect = function(qIndex, element, correctValue) {
+        const parent = document.getElementById(`q${qIndex}`);
+        if (parent.classList.contains('disabled')) return;
 
-        if (optionsList.classList.contains('disabled')) return;
+        const isCorrect = element.innerText === correctValue;
 
-        if (optIndex === correctIndex) {
-            selectedOption.classList.add('correct');
+        if (isCorrect) {
+            element.classList.add('correct');
             correctScore++;
         } else {
-            selectedOption.classList.add('wrong');
-            optionsList.children[correctIndex].classList.add('correct');
+            element.classList.add('wrong');
+            // إظهار الإجابة الصحيحة
+            Array.from(parent.children).forEach(child => {
+                if (child.innerText === correctValue) child.classList.add('correct');
+            });
             wrongScore++;
         }
 
-        optionsList.classList.add('disabled');
+        parent.classList.add('disabled');
         answeredQuestions++;
         updateStats();
-    };
+    }
 
     function updateStats() {
         document.getElementById('correct-count').innerText = correctScore;
         document.getElementById('wrong-count').innerText = wrongScore;
         document.getElementById('progress').innerText = `${answeredQuestions}/65`;
-        
         const perc = answeredQuestions === 0 ? 0 : Math.round((correctScore / answeredQuestions) * 100);
         document.getElementById('percentage').innerText = perc + '%';
     }
